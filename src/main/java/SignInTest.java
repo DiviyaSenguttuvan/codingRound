@@ -1,32 +1,49 @@
-import com.sun.javafx.PlatformUtil;
+import java.util.Properties;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class SignInTest {
 
-    WebDriver driver = new ChromeDriver();
+    WebDriver driver;
+    BaseTestConfiguration base;
+    Properties resource;
+    
+    @BeforeTest
+    public void beforeTest() {
+    	base = BaseTestConfiguration.getBaseConfiguration();
+    	driver = BaseTestConfiguration.getDriver();
+    	resource = BaseTestConfiguration.getProperties();
+    }
 
     @Test
     public void shouldThrowAnErrorIfSignInDetailsAreMissing() {
-
-        setDriverPath();
-
-        driver.get("https://www.cleartrip.com/");
-        waitFor(2000);
-
-        driver.findElement(By.linkText("Your trips")).click();
-        driver.findElement(By.id("SignIn")).click();
-
-        driver.findElement(By.id("signInButton")).click();
-
-        String errors1 = driver.findElement(By.id("errors1")).getText();
-        Assert.assertTrue(errors1.contains("There were errors in your submission"));
-        driver.quit();
+    	try {
+    		driver.get(resource.getProperty("signin_weburl"));
+	        waitFor(2000);
+	        driver.findElement(By.linkText(resource.getProperty("signin_linkText"))).click();
+	        driver.findElement(By.id(resource.getProperty("signin_button_id"))).click();
+	        waitFor(2000);
+	        //Switch to frame window and click on SignIn Button
+	        driver.switchTo().frame(resource.getProperty("signin_framename"));
+	        driver.findElement(By.id(resource.getProperty("signin_frame_button"))).click();
+	
+	        String errors1 = driver.findElement(By.id(resource.getProperty("signin_frame_errors"))).getText();
+	        Assert.assertTrue(errors1.contains(resource.getProperty("signin_frame_errors_message")));     
+    	} catch(Exception e) {
+    		Assert.fail("Exception / Error while running SignInTest : "+e);
+    	}
     }
 
+    @AfterTest
+    public void quitDriver(){
+    	driver.quit();
+    }
+    
     private void waitFor(int durationInMilliSeconds) {
         try {
             Thread.sleep(durationInMilliSeconds);
@@ -34,18 +51,4 @@ public class SignInTest {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-
-    private void setDriverPath() {
-        if (PlatformUtil.isMac()) {
-            System.setProperty("webdriver.chrome.driver", "chromedriver");
-        }
-        if (PlatformUtil.isWindows()) {
-            System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-        }
-        if (PlatformUtil.isLinux()) {
-            System.setProperty("webdriver.chrome.driver", "chromedriver_linux");
-        }
-    }
-
-
 }

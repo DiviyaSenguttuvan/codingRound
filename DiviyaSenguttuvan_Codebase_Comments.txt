@@ -1,0 +1,39 @@
+Errors resolved in the Test Class : 
+-----------------------------------
+1. SignInTest : 
+	Error occured :
+		SignIn button is present inside iframe content, so without switch to it will not find the element and caused the test to fail.
+	Fix :
+		Added a line of code, driver.switchTo().frame(resource.getProperty("signin_framename"));.
+2. FlightBookingTest : 
+	Error Occured :
+		There is no 'id' in the name of toTag, so it failed.
+	Fix : 
+		Found correct id for to, is ToTag instead of toTag and it works
+3. HotelBookinTest : 
+	Error Occured : 
+		In the Page Object Model pattern, if we need to use FindBy annotation at field elements, it should be initialized but it was not initialized at anywhere inside the HotelBookingtest class.
+	Fix : 
+		After putting a single line , PageFactory.initElements(driver, this); before test method it will initialize the driver elements annotated with FindBy annotation, and it executes after it.
+
+Code Refactors :
+----------------
+1. Created a new BaseTestConfiguration.java class which will help us to instantiate and initialize driver, browserplatform - Enccapsulation, Abstraction and Maintenance.
+2. Instead of creating driver from test classes instead abstracted class called BaseTestConfiguration is used to return the created driver instance and launch the browserplatform.Maintenance will be increased in the way.
+3. As implemented TDD pattern inside the codebase by creating testresources.properties which will be used provide the id,xpath values to the test class elements, helps readability and maintenance.		   
+   No need to touch or modify the test classes if try to change the values.
+4. Added support for other browsers other than Chrome such as IE, Firefox, Edge and Safari browsers. - Reusability and extensibility in OOPS principles
+
+Classes / Libraries Added:
+-------------------------
+1. BaseTestConfiguration.java
+
+Libraries added:
+---------------
+1. added new chromedriver.exe
+2. added IEDriverServer.exe
+3. added MicrosoftWebDriver for Edge browser.
+4. added geckodriver for Firefox Gecko support.
+5. testresources.properties
+6. added testng.xml file for running TestNG tests.
+
